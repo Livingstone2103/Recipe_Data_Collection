@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Explorer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-md-12 col-lg-8">
+                <!-- Header -->
+                <div class="header-section mb-4">
+                    <h1 class="display-4 mb-4">Recipe Explorer</h1>
+                    <p class="lead">Discover delicious recipes from around the world</p>
+                </div>
+
+                <!-- Controls -->
+                <div class="controls-section mb-4">
+                    <div class="row">
+                        <!-- Search -->
+                        <div class="col-12 col-md-6 mb-3">
+                            <div class="input-group">
+                                <input type="text" id="searchInput" class="form-control" placeholder="Search recipes...">
+                                <button class="btn btn-primary" type="button" id="searchBtn">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Results per page -->
+                        <div class="col-12 col-md-3 mb-3">
+                            <select id="resultsPerPage" class="form-select">
+                                <option value="15">Show 15 per page</option>
+                                <option value="25">Show 25 per page</option>
+                                <option value="50">Show 50 per page</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort by -->
+                        <div class="col-12 col-md-3 mb-3">
+                            <select id="sortBy" class="form-select">
+                                <option value="title">Sort by Title</option>
+                                <option value="rating">Sort by Rating</option>
+                                <option value="time">Sort by Total Time</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-section mb-4">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Cuisine</span>
+                                    <input type="text" id="cuisineFilter" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Rating</span>
+                                    <input type="text" id="ratingFilter" class="form-control" placeholder="e.g., >=4.5">
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Calories</span>
+                                    <input type="text" id="caloriesFilter" class="form-control" placeholder="e.g., <=500">
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="input-group">
+                                    <span class="input-group-text">Time</span>
+                                    <input type="text" id="timeFilter" class="form-control" placeholder="e.g., <=60">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recipe List -->
+                <div class="recipe-list">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Cuisine</th>
+                                    <th>Rating</th>
+                                    <th>Total Time</th>
+                                    <th>Serves</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recipeTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Pagination" class="mt-4">
+                    <ul class="pagination justify-content-center" id="pagination">
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Recipe Details -->
+            <div class="col-lg-4 d-none d-lg-block" id="recipeDetails">
+                <div class="recipe-details-card">
+                    <div class="recipe-header">
+                        <h2 id="recipeTitle"></h2>
+                        <span id="recipeCuisine" class="badge bg-secondary"></span>
+                    </div>
+                    
+                    <div class="recipe-content">
+                        <div class="description-section mb-4">
+                            <h3>Description</h3>
+                            <p id="recipeDescription"></p>
+                        </div>
+
+                        <div class="time-section mb-4">
+                            <h3>Preparation Time</h3>
+                            <div class="time-details">
+                                <div class="time-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Total Time: <span id="totalTime">-</span></span>
+                                </div>
+                                <div class="time-item">
+                                    <i class="fas fa-utensils"></i>
+                                    <span>Prep Time: <span id="prepTime">-</span></span>
+                                </div>
+                                <div class="time-item">
+                                    <i class="fas fa-fire"></i>
+                                    <span>Cook Time: <span id="cookTime">-</span></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="nutrition-section">
+                            <h3>Nutrition Information</h3>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody id="nutritionTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fallback Screens -->
+    <div id="noResults" class="fallback-screen d-none">
+        <div class="text-center">
+            <i class="fas fa-search fa-4x mb-3"></i>
+            <h2>No Results Found</h2>
+            <p>Try adjusting your filters or search criteria.</p>
+        </div>
+    </div>
+
+    <div id="noData" class="fallback-screen d-none">
+        <div class="text-center">
+            <i class="fas fa-database fa-4x mb-3"></i>
+            <h2>No Data Available</h2>
+            <p>The recipe database is empty. Please try again later.</p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
